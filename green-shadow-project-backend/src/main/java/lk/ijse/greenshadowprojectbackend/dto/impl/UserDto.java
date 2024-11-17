@@ -12,4 +12,5 @@ public class UserDto implements UserStatus {
     private String id;
     private String username;
     private String email;
+    private String staffId;
 }

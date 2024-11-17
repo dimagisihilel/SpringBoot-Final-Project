@@ -2,9 +2,13 @@ package lk.ijse.greenshadowprojectbackend.service.impl;
 
 import lk.ijse.greenshadowprojectbackend.dto.impl.CropDto;
 import lk.ijse.greenshadowprojectbackend.service.CropService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
+@Transactional
 public class CropServiceImpl implements CropService {
     @Override
     public CropDto save(CropDto dto) {

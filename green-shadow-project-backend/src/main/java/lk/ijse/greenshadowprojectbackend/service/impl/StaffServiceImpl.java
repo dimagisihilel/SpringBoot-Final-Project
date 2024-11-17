@@ -2,9 +2,13 @@ package lk.ijse.greenshadowprojectbackend.service.impl;
 
 import lk.ijse.greenshadowprojectbackend.dto.impl.StaffDto;
 import lk.ijse.greenshadowprojectbackend.service.StaffService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
+@Transactional
 public class StaffServiceImpl implements StaffService {
     @Override
     public StaffDto save(StaffDto dto) {

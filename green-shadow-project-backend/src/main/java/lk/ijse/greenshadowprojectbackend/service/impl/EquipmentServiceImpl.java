@@ -2,9 +2,13 @@ package lk.ijse.greenshadowprojectbackend.service.impl;
 
 import lk.ijse.greenshadowprojectbackend.dto.impl.EquipmentDto;
 import lk.ijse.greenshadowprojectbackend.service.EquipmentService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
+@Transactional
 public class EquipmentServiceImpl implements EquipmentService {
     @Override
     public EquipmentDto save(EquipmentDto dto) {

@@ -2,9 +2,13 @@ package lk.ijse.greenshadowprojectbackend.service.impl;
 
 import lk.ijse.greenshadowprojectbackend.dto.impl.LogDto;
 import lk.ijse.greenshadowprojectbackend.service.LogService;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Service
+@Transactional
 public class LogServiceImpl implements LogService {
     @Override
     public LogDto save(LogDto dto) {

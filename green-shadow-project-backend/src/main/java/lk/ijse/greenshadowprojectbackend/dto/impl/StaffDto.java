@@ -1,5 +1,6 @@
 package lk.ijse.greenshadowprojectbackend.dto.impl;
 
+import lk.ijse.greenshadowprojectbackend.dto.StaffStatus;
 import lk.ijse.greenshadowprojectbackend.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.sql.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class StaffDto {
+public class StaffDto implements StaffStatus {
     private String staffId;
     private String firstName;
     private String lastName;

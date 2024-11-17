@@ -1,4 +1,6 @@
 package lk.ijse.greenshadowprojectbackend.dto;
 
-public class SuperDto {
+import java.io.Serializable;
+
+public interface SuperDto extends Serializable {
 }

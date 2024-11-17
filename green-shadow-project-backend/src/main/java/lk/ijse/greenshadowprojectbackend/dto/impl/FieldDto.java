@@ -1,5 +1,6 @@
 package lk.ijse.greenshadowprojectbackend.dto.impl;
 
+import lk.ijse.greenshadowprojectbackend.dto.FieldStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class FieldDto {
+public class FieldDto implements FieldStatus {
     private String fieldId;
     private String name;
     private String location;

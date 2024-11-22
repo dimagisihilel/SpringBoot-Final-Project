@@ -1,5 +1,6 @@
 package lk.ijse.greenshadowprojectbackend.controller;
 
+import lk.ijse.greenshadowprojectbackend.dto.impl.FieldDto;
 import lk.ijse.greenshadowprojectbackend.dto.impl.StaffDto;
 import lk.ijse.greenshadowprojectbackend.exception.StaffNotFoundException;
 import lk.ijse.greenshadowprojectbackend.service.StaffService;
@@ -65,5 +66,11 @@ public class StaffController {
             return new ResponseEntity<>( "Staff not found", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(staffDto, HttpStatus.OK);
+    }
+
+    @GetMapping("/{staffId}/field")
+    public ResponseEntity<List<FieldDto>> getFieldsOfStaffId(@PathVariable("staffId") String staffId) {
+        List<FieldDto> fieldDtos = staffService.getFieldsOfStaffId(staffId);
+        return ResponseEntity.ok(fieldDtos);
     }
 }

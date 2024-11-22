@@ -49,6 +49,18 @@ public class FieldServiceImpl implements FieldService {
         existingField.setName(dto.getName());
         existingField.setSize(dto.getSize());
         existingField.setLocation(dto.getLocation());
+
+        // Update staff members if provided
+        if (dto.getStaffIds() != null && !dto.getStaffIds().isEmpty()) {
+            List<StaffEntity> staffEntities = staffDao.findAllById(dto.getStaffIds());
+            if (staffEntities.size() != dto.getStaffIds().size()) {
+                throw new IllegalArgumentException("One or more staff IDs are invalid.");
+            }
+            existingField.setStaffMembers(new HashSet<>(staffEntities));
+        } else {
+            existingField.getStaffMembers().clear();  // Clear existing staff if no IDs are provided
+        }
+
         // Handle images if provided
         if (dto.getImage1() != null) {
             existingField.setImage1(dto.getImage1());

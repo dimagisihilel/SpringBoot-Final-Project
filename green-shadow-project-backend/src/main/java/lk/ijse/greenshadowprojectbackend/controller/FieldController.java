@@ -2,6 +2,7 @@ package lk.ijse.greenshadowprojectbackend.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lk.ijse.greenshadowprojectbackend.dto.impl.FieldDto;
+import lk.ijse.greenshadowprojectbackend.dto.impl.StaffDto;
 import lk.ijse.greenshadowprojectbackend.exception.FieldNotFoundException;
 import lk.ijse.greenshadowprojectbackend.service.FieldService;
 import lk.ijse.greenshadowprojectbackend.util.AppUtil;
@@ -107,5 +108,11 @@ public class FieldController {
         }
         return new ResponseEntity<>(fieldDto, HttpStatus.OK);
     }
+    @GetMapping("/{fieldId}/staff")
+    public ResponseEntity<List<StaffDto>> getStaffByFieldId(@PathVariable("fieldId") String fieldId) {
+        List<StaffDto> staffList = fieldService.getStaffIdsByFieldId(fieldId);
+        return ResponseEntity.ok(staffList);
+    }
+
 
 }

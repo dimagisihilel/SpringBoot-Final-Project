@@ -1,8 +1,11 @@
 package lk.ijse.greenshadowprojectbackend.service.impl;
 
 import lk.ijse.greenshadowprojectbackend.dao.FieldDao;
+import lk.ijse.greenshadowprojectbackend.dao.StaffDao;
 import lk.ijse.greenshadowprojectbackend.dto.impl.FieldDto;
+import lk.ijse.greenshadowprojectbackend.dto.impl.StaffDto;
 import lk.ijse.greenshadowprojectbackend.entity.FieldEntity;
+import lk.ijse.greenshadowprojectbackend.entity.StaffEntity;
 import lk.ijse.greenshadowprojectbackend.service.FieldService;
 import lk.ijse.greenshadowprojectbackend.util.AppUtil;
 import lk.ijse.greenshadowprojectbackend.util.Mapping;
@@ -10,8 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -20,11 +22,24 @@ public class FieldServiceImpl implements FieldService {
     @Autowired
     private FieldDao fieldDao;
     @Autowired
+    private StaffDao staffDao;
+    @Autowired
     private Mapping fieldMapping;
     @Override
     public FieldDto save(FieldDto dto) {
         dto.setFieldId(AppUtil.generateFieldId());
-        return fieldMapping.toFieldDto(fieldDao.save(fieldMapping.toFieldEntity(dto)));
+        FieldEntity field = fieldMapping.toFieldEntity(dto);
+        // Associate staff with field
+        Set<StaffEntity> staffEntities = new HashSet<>();
+        if (dto.getStaffIds() != null) {
+            for (String staffId : dto.getStaffIds()) {
+                StaffEntity staff = staffDao.findById(staffId)
+                        .orElseThrow(() -> new IllegalArgumentException("Staff not found with ID: " + staffId));
+                staffEntities.add(staff);
+            }
+        }
+        field.setStaffMembers(staffEntities);
+        return fieldMapping.toFieldDto(fieldDao.save(field));
     }
     @Override
     public FieldDto update(String id, FieldDto dto) {
@@ -59,5 +74,13 @@ public class FieldServiceImpl implements FieldService {
     @Override
     public List<FieldDto> findAll() {
         return fieldMapping.asFieldDtoList(fieldDao.findAll());
+    }
+
+    @Override
+    public List<StaffDto> getStaffIdsByFieldId(String fieldId) {
+        FieldEntity field = fieldDao.findById(fieldId)
+                .orElseThrow(() -> new IllegalArgumentException("Field not found with ID: " + fieldId));
+
+        return fieldMapping.asStaffDtoList(new ArrayList<>(field.getStaffMembers()));
     }
 }

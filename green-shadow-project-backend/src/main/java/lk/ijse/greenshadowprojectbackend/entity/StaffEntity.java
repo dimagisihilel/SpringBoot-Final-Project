@@ -24,15 +24,10 @@ public class StaffEntity {
     private Date joinDate;
     @Enumerated(EnumType.STRING)
     private Role role;
-    @OneToOne(mappedBy = "staff")
+    @OneToOne(mappedBy = "staff",cascade = CascadeType.ALL, orphanRemoval = true)
     private UserEntity user;
-    @ManyToMany
-    @JoinTable(
-            name = "staff_fields_detail",
-            joinColumns = @JoinColumn(name = "staff_id"),
-            inverseJoinColumns = @JoinColumn(name = "field_id")
-    )
+    @ManyToMany(mappedBy = "staffMembers",cascade = CascadeType.ALL)
     private List<FieldEntity> fields;
-    @OneToMany(mappedBy = "staff")
+    @OneToMany(mappedBy = "staff",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<VehicleEntity> vehicles;
 }

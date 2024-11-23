@@ -34,4 +34,7 @@ public class FieldEntity {
 
     @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CropEntity> crops ;
+
+    @ManyToMany(mappedBy = "fieldLogs",cascade = CascadeType.ALL)
+    private List<LogEntity> logs;
 }

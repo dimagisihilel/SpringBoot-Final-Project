@@ -23,7 +23,6 @@ public class StaffServiceImpl implements StaffService {
     private StaffDao staffDao;
     @Autowired
     private Mapping staffMapper;
-
     @Override
     public StaffDto save(StaffDto dto) {
         dto.setStaffId(AppUtil.generateStaffId());

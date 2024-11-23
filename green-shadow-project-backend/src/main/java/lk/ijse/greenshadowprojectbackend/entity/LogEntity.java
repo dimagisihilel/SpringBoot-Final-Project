@@ -20,7 +20,7 @@ public class LogEntity {
     @Column(columnDefinition = "LONGTEXT")
     private String image2;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "staff_logs_details",
             joinColumns = @JoinColumn(name = "log_id"),
@@ -28,7 +28,7 @@ public class LogEntity {
     )
     private Set<StaffEntity> staffLogs = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "field_logs",
             joinColumns = @JoinColumn(name = "log_id"),
@@ -36,7 +36,7 @@ public class LogEntity {
     )
     private Set<FieldEntity> fieldLogs = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(
             name = "crop_logs",
             joinColumns = @JoinColumn(name = "log_id"),

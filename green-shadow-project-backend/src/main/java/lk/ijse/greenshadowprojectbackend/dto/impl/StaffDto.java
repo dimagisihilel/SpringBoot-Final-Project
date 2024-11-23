@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -21,4 +22,5 @@ public class StaffDto implements StaffStatus {
     private String contact;
     private Date joinDate;
     private Role role;
+    private List<String> fieldIds;
 }

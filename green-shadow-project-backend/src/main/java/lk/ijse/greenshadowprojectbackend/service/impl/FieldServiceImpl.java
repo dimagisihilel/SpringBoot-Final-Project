@@ -27,7 +27,7 @@ public class FieldServiceImpl implements FieldService {
     private Mapping fieldMapping;
     @Override
     public FieldDto save(FieldDto dto) {
-        dto.setFieldId(AppUtil.generateFieldId());
+        /*dto.setFieldId(AppUtil.generateFieldId());
         FieldEntity field = fieldMapping.toFieldEntity(dto);
         // Associate staff with field
         Set<StaffEntity> staffEntities = new HashSet<>();
@@ -39,7 +39,14 @@ public class FieldServiceImpl implements FieldService {
             }
         }
         field.setStaffMembers(staffEntities);
-        return fieldMapping.toFieldDto(fieldDao.save(field));
+        return fieldMapping.toFieldDto(fieldDao.save(field));*/
+        dto.setFieldId(AppUtil.generateFieldId());
+        FieldEntity field = fieldMapping.toFieldEntity(dto);
+        try {
+            return fieldMapping.toFieldDto(fieldDao.save(field));
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving field: " + e.getMessage(), e);
+        }
     }
     @Override
     public FieldDto update(String id, FieldDto dto) {

@@ -1,12 +1,13 @@
 package lk.ijse.greenshadowprojectbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.HashSet;
+
 import java.util.List;
-import java.util.Set;
+
 @Entity
 @Table(name = "crop")
 @AllArgsConstructor
@@ -15,16 +16,18 @@ import java.util.Set;
 public class CropEntity {
     @Id
     private String cropId;
+
     private String commonName;
     private String specificName;
     private String category;
     private String season;
     @Column(columnDefinition = "LONGTEXT")
     private String image1;
+
     @ManyToOne
     @JoinColumn(name = "field_id")
     private FieldEntity field;
-
     @ManyToMany(mappedBy = "cropLogs",cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<LogEntity> logs;
 }

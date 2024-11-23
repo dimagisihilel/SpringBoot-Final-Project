@@ -1,13 +1,15 @@
 package lk.ijse.greenshadowprojectbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.geo.Point;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
 @Entity
 @Table(name = "field")
 @AllArgsConstructor
@@ -24,17 +26,18 @@ public class FieldEntity {
     @Column(columnDefinition = "LONGTEXT")
     private String image2;
 
-    @ManyToMany
-    @JoinTable(
-            name = "staff_fields_detail",
-            joinColumns = @JoinColumn(name = "field_id"),
-            inverseJoinColumns = @JoinColumn(name = "staff_id")
-    )
+    @ManyToMany(mappedBy = "fields",cascade = CascadeType.ALL)
+    @JsonBackReference
     private Set<StaffEntity> staffMembers = new HashSet<>();
 
     @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CropEntity> crops ;
-
     @ManyToMany(mappedBy = "fieldLogs",cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<LogEntity> logs;
+    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EquipmentEntity> equipment;
+
+
+
 }

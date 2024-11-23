@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "equipment")
 @NoArgsConstructor
@@ -15,10 +16,12 @@ public class EquipmentEntity {
     private String type;
     private String name;
     private String status;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "field_id")
     private FieldEntity field;
-    @ManyToOne
+
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staff_id")
     private StaffEntity staff;
 }

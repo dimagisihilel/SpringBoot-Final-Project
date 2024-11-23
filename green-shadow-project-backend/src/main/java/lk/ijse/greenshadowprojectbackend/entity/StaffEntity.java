@@ -1,11 +1,15 @@
 package lk.ijse.greenshadowprojectbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.sql.Date;
 import java.util.List;
+
 @Entity
 @Table(name = "staff")
 @AllArgsConstructor
@@ -28,12 +32,25 @@ public class StaffEntity {
     private Role role;
     @OneToOne(mappedBy = "staff",cascade = CascadeType.ALL, orphanRemoval = true)
     private UserEntity user;
-    @ManyToMany(mappedBy = "staffMembers",cascade = CascadeType.ALL)
-    private List<FieldEntity> fields;
 
+
+
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "staff_fields_detail",
+            joinColumns = @JoinColumn(name = "staff_id"),
+            inverseJoinColumns = @JoinColumn(name = "field_id")
+    )
+    @JsonManagedReference // Manage the serialization
+    private List<FieldEntity> fields;
     @ManyToMany(mappedBy = "staffLogs",cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<LogEntity> logs;
 
     @OneToMany(mappedBy = "staff",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<VehicleEntity> vehicles;
+    @OneToMany(mappedBy = "staff", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EquipmentEntity> equipment;
+
+
 }

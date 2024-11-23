@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "vehicle")
 @NoArgsConstructor
@@ -17,7 +18,8 @@ public class VehicleEntity {
     private String fuelType;
     private String status;
     private String remarks;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "staff_id")
     private StaffEntity staff;
+
 }

@@ -4,7 +4,10 @@ import lk.ijse.greenshadowprojectbackend.dao.CropDao;
 import lk.ijse.greenshadowprojectbackend.dao.FieldDao;
 import lk.ijse.greenshadowprojectbackend.dao.LogDao;
 import lk.ijse.greenshadowprojectbackend.dao.StaffDao;
+import lk.ijse.greenshadowprojectbackend.dto.impl.CropDto;
+import lk.ijse.greenshadowprojectbackend.dto.impl.FieldDto;
 import lk.ijse.greenshadowprojectbackend.dto.impl.LogDto;
+import lk.ijse.greenshadowprojectbackend.dto.impl.StaffDto;
 import lk.ijse.greenshadowprojectbackend.entity.CropEntity;
 import lk.ijse.greenshadowprojectbackend.entity.FieldEntity;
 import lk.ijse.greenshadowprojectbackend.entity.LogEntity;
@@ -16,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Transactional
@@ -36,6 +36,7 @@ public class LogServiceImpl implements LogService {
     private Mapping logMapping;
 
     @Override
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('SCIENTIST')")
     public LogDto save(LogDto dto) {
         dto.setLogId(AppUtil.generateLogId());
         LogEntity logEntity = logMapping.toLogEntity(dto);
@@ -67,18 +68,23 @@ public class LogServiceImpl implements LogService {
         LogEntity savedLog = logDao.save(logEntity);
         return logMapping.toLogDto(savedLog);
     }
+
     @Override
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('SCIENTIST')")
     public LogDto update(String id, LogDto dto) {
         LogEntity existingLog = logDao.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Log not found with ID: " + id));
+
         // Update basic fields
         existingLog.setLogDetails(dto.getLogDetails());
         existingLog.setDate( dto.getDate());
+
         // Handle image update if provided
         if (dto.getImage2() != null) {
             existingLog.setImage2(dto.getImage2());
         }
-        // Update associated staff
+
+       /* // Update associated staff
         if (dto.getStaffIds() != null && !dto.getStaffIds().isEmpty()) {
             List<StaffEntity> staffEntities = staffDao.findAllById(dto.getStaffIds());
             if (staffEntities.size() != dto.getStaffIds().size()) {
@@ -86,6 +92,7 @@ public class LogServiceImpl implements LogService {
             }
             existingLog.setStaffLogs(new HashSet<>(staffEntities));
         }
+
         // Update associated fields
         if (dto.getFieldIds() != null && !dto.getFieldIds().isEmpty()) {
             List<FieldEntity> fieldEntities = fieldDao.findAllById(dto.getFieldIds());
@@ -94,6 +101,7 @@ public class LogServiceImpl implements LogService {
             }
             existingLog.setFieldLogs(new HashSet<>(fieldEntities));
         }
+
         // Update associated crops
         if (dto.getCropIds() != null && !dto.getCropIds().isEmpty()) {
             List<CropEntity> cropEntities = cropDao.findAllById(dto.getCropIds());
@@ -101,15 +109,41 @@ public class LogServiceImpl implements LogService {
                 throw new IllegalArgumentException("One or more crop IDs are invalid.");
             }
             existingLog.setCropLogs(new HashSet<>(cropEntities));
+        }*/
+        // Update associated staff
+        if (dto.getStaffIds() != null && !dto.getStaffIds().isEmpty()) {
+            updateStaffAssociations(existingLog, dto.getStaffIds());
+        } else {
+            existingLog.getStaffLogs().clear(); // Clear if no staff IDs are provided
         }
+
+        // Update associated fields
+        if (dto.getFieldIds() != null && !dto.getFieldIds().isEmpty()) {
+            updateFieldAssociations(existingLog, dto.getFieldIds());
+        } else {
+            existingLog.getFieldLogs().clear(); // Clear if no field IDs are provided
+        }
+
+        // Update associated crops
+        if (dto.getCropIds() != null && !dto.getCropIds().isEmpty()) {
+            updateCropAssociations(existingLog, dto.getCropIds());
+        } else {
+            existingLog.getCropLogs().clear(); // Clear if no crop IDs are provided
+        }
+
+
         // Save the updated log entity and return the updated DTO
         return logMapping.toLogDto(logDao.save(existingLog));
     }
+
     @Override
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('SCIENTIST')")
     public void delete(String id) {
         logDao.deleteById(id);
     }
+
     @Override
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR') or hasRole('SCIENTIST')")
     public LogDto findById(String id) {
         Optional<LogEntity> byId = logDao.findById(id);
         if (byId.isPresent()){
@@ -117,8 +151,96 @@ public class LogServiceImpl implements LogService {
         }
         return null;
     }
+
     @Override
+    // @PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR') or hasRole('SCIENTIST')")
     public List<LogDto> findAll() {
         return  logMapping.asLogDtoList(logDao.findAll());
+    }
+
+    private void updateStaffAssociations(LogEntity log, Set<String> staffIds) {
+        List<StaffEntity> staffEntities = staffDao.findAllById(staffIds);
+        if (staffEntities.size() != staffIds.size()) {
+            throw new IllegalArgumentException("One or more staff IDs are invalid.");
+        }
+
+        // Add only new associations
+        for (StaffEntity staff : staffEntities) {
+            if (!log.getStaffLogs().contains(staff)) {
+                log.getStaffLogs().add(staff);
+                staff.getLogs().add(log); // Maintain bi-directional association
+            }
+        }
+
+        // Remove unreferenced associations
+        log.getStaffLogs().removeIf(staff -> !staffEntities.contains(staff));
+    }
+
+    private void updateFieldAssociations(LogEntity log, Set<String> fieldIds) {
+        List<FieldEntity> fieldEntities = fieldDao.findAllById(fieldIds);
+        if (fieldEntities.size() != fieldIds.size()) {
+            throw new IllegalArgumentException("One or more field IDs are invalid.");
+        }
+
+        // Add only new associations
+        for (FieldEntity field : fieldEntities) {
+            if (!log.getFieldLogs().contains(field)) {
+                log.getFieldLogs().add(field);
+                field.getLogs().add(log); // Maintain bi-directional association
+            }
+        }
+
+        // Remove unreferenced associations
+        log.getFieldLogs().removeIf(field -> !fieldEntities.contains(field));
+    }
+
+    private void updateCropAssociations(LogEntity log, Set<String> cropIds) {
+        List<CropEntity> cropEntities = cropDao.findAllById(cropIds);
+        if (cropEntities.size() != cropIds.size()) {
+            throw new IllegalArgumentException("One or more crop IDs are invalid.");
+        }
+
+        // Add only new associations
+        for (CropEntity crop : cropEntities) {
+            if (!log.getCropLogs().contains(crop)) {
+                log.getCropLogs().add(crop);
+                crop.getLogs().add(log); // Maintain bi-directional association
+            }
+        }
+
+        // Remove unreferenced associations
+        log.getCropLogs().removeIf(crop -> !cropEntities.contains(crop));
+    }
+
+    @Override
+    public Map<String, Object> getRelatedEntitiesAsDtos(String logId) {
+        Map<String, Object> relatedEntities = new HashMap<>();
+        List<FieldDto> fieldDtos = null;
+        List<CropDto> cropDtos=null;
+        List<StaffDto> staffDtos =null;
+        Optional<LogEntity> logEntity = logDao.findById(logId);
+        if (logEntity.isPresent()){
+            LogEntity log = logEntity.get();
+            // Convert PersistentSet to List
+            List<FieldEntity> fieldEntities = new ArrayList<>(log.getFieldLogs());
+            List<CropEntity> cropEntities = new ArrayList<>(log.getCropLogs());
+            List<StaffEntity> staffEntities = new ArrayList<>(log.getStaffLogs());
+            if (!fieldEntities.isEmpty()){
+                fieldDtos =  logMapping.asFieldDtoList(fieldEntities);
+            }
+            if ((!cropEntities.isEmpty())){
+                cropDtos = logMapping.asCropDtoList( cropEntities);
+            }
+            if (!staffEntities.isEmpty()){
+                staffDtos = logMapping.asStaffDtoList( staffEntities);
+            }
+
+        }
+        relatedEntities.put("fields", fieldDtos);
+        relatedEntities.put("crops", cropDtos);
+        relatedEntities.put("staff", staffDtos);
+
+        return relatedEntities;
+
     }
 }

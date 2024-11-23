@@ -21,18 +21,21 @@ public class StaffController {
     private StaffService staffService;
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR') or hasRole('SCIENTIST')")
     public ResponseEntity<StaffDto> saveStaff(@RequestBody StaffDto staffDto) {
         StaffDto savedStaff = staffService.save(staffDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedStaff);
     }
 
     @PutMapping(value = "/{staffId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    // @PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR') or hasRole('SCIENTIST')")
     public ResponseEntity<StaffDto> updateStaff(@PathVariable("staffId") String staffId, @RequestBody StaffDto staffDto) {
         StaffDto updatedStaff = staffService.update(staffId, staffDto);
         return ResponseEntity.ok(updatedStaff);
     }
 
     @DeleteMapping("/{staffId}")
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR') or hasRole('SCIENTIST')")
     public ResponseEntity<String> deleteStaff(@PathVariable("staffId") String staffId) {
         try{
             if (!RegexUtilForId.isValidStaffId(staffId)){
@@ -47,8 +50,9 @@ public class StaffController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
-    }
 
+
+    }
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<StaffDto> getAllUsers(){
         return staffService.findAll();
@@ -60,11 +64,13 @@ public class StaffController {
         if (!RegexUtilForId.isValidStaffId(staffId)) {
             return new ResponseEntity<>( "Staff ID format is invalid", HttpStatus.BAD_REQUEST);
         }
+
         // Retrieve the field
         StaffDto staffDto = staffService.findById(staffId);
         if (staffDto == null) {
             return new ResponseEntity<>( "Staff not found", HttpStatus.NOT_FOUND);
         }
+
         return new ResponseEntity<>(staffDto, HttpStatus.OK);
     }
 

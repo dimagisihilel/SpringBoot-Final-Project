@@ -25,6 +25,7 @@ public class CropController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> saveCrop(@RequestParam("cropData") String cropData,
                                       @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) {
+
         // Convert cropData JSON string to CropDto object
         CropDto cropDto;
         try {
@@ -34,6 +35,7 @@ public class CropController {
             if (!RegexUtilForId.isValidFieldId(cropDto.getFieldId())) {
                 return new ResponseEntity<>("Invalid field ID format", HttpStatus.BAD_REQUEST);
             }
+
             // Convert the image file to Base64 string if provided
             if (imageFile != null && !imageFile.isEmpty()) {
                 try {
@@ -42,6 +44,7 @@ public class CropController {
                     throw new RuntimeException(e);
                 }
             }
+
             // Save the crop
             CropDto savedCrop = cropService.save(cropDto);
             return new ResponseEntity<>(savedCrop, HttpStatus.CREATED);
@@ -49,6 +52,8 @@ public class CropController {
             e.printStackTrace();
             return new ResponseEntity<>("Invalid crop data", HttpStatus.BAD_REQUEST);
         }
+
+
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -57,6 +62,7 @@ public class CropController {
             @RequestParam("cropData") String cropData,
             @RequestParam(value = "imageFile", required = false) MultipartFile imageFile)
     {
+
         try {
             if (!RegexUtilForId.isValidCropId(cropId)){
                 return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -64,15 +70,20 @@ public class CropController {
             // Convert fieldData JSON string to FieldDto object
             ObjectMapper objectMapper = new ObjectMapper();
             CropDto cropDto = objectMapper.readValue(cropData, CropDto.class);
+
             // Convert images to Base64 if provided and set them in the DTO
             if (imageFile != null && !imageFile.isEmpty()) {
                 cropDto.setImage1(AppUtil.imageToBase64(imageFile.getBytes()));
             }
+
+
             // Call the service to update the field
             cropService.update(cropId, cropDto);
+
             return ResponseEntity.status(HttpStatus.OK).body("Crop updated successfully");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating crop: " + e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error updating Crop: " + e.getMessage());
         }
     }
 
@@ -92,25 +103,28 @@ public class CropController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
     }
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CropDto> getAllUsers(){
         return cropService.findAll();
     }
+
     @GetMapping(value = "/{cropId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getCropById(@PathVariable("cropId") String cropId) {
         // Validate field ID format using RegexUtilForId
         if (!RegexUtilForId.isValidCropId(cropId)) {
             return new ResponseEntity<>( "Crop ID format is invalid", HttpStatus.BAD_REQUEST);
         }
+
         // Retrieve the field
         CropDto cropDto = cropService.findById(cropId);
         if (cropDto == null) {
             return new ResponseEntity<>( "Crop not found", HttpStatus.NOT_FOUND);
         }
+
         return new ResponseEntity<>(cropDto, HttpStatus.OK);
     }
-
 
 
 }

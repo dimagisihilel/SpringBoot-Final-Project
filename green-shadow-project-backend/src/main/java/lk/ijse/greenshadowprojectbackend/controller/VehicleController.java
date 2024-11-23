@@ -17,6 +17,7 @@ import java.util.List;
 public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
+
     // Save Vehicle
     @PostMapping
     public ResponseEntity<VehicleDto> saveVehicle(@RequestBody VehicleDto vehicleDto) {
@@ -44,16 +45,20 @@ public class VehicleController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+
     }
     @GetMapping("/{vehicleId}")
     public ResponseEntity<VehicleDto> getVehicleById(@PathVariable String vehicleId) {
         VehicleDto vehicle = vehicleService.findById(vehicleId);
         return new ResponseEntity<>(vehicle, HttpStatus.OK);
     }
+
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public List<VehicleDto> getAllUsers(){
         return vehicleService.findAll();
     }
+
     // Get Vehicles by Staff ID
     @GetMapping("/staff/{staffId}")
     public ResponseEntity<List<VehicleDto>> getVehiclesByStaffId(@PathVariable String staffId) {

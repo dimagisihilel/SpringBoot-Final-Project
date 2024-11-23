@@ -42,17 +42,21 @@ public class EquipmentController {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+
     }
     @GetMapping("/{equipmentId}")
     public ResponseEntity<EquipmentDto> getEquipmentById(@PathVariable String equipmentId) {
         EquipmentDto equipment = equipmentService.findById(equipmentId);
         return ResponseEntity.ok(equipment);
     }
+
     @GetMapping("/staff/{staffId}")
     public ResponseEntity<List<EquipmentDto>> getEquipmentByStaffId(@PathVariable String staffId) {
         List<EquipmentDto> equipmentList = equipmentService.getEquipmentByStaffId(staffId);
         return ResponseEntity.ok(equipmentList);
     }
+
     @GetMapping("/field/{fieldId}")
     public ResponseEntity<List<EquipmentDto>> getEquipmentByFieldId(@PathVariable String fieldId) {
         List<EquipmentDto> equipmentList = equipmentService.getEquipmentByFieldId(fieldId);

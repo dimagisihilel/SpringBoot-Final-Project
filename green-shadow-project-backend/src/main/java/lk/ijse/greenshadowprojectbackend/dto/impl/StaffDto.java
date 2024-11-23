@@ -16,6 +16,8 @@ public class StaffDto implements StaffStatus {
     private String staffId;
     private String firstName;
     private String lastName;
+    private String gender;
+    private String designation;
     private String email;
     private Date dob;
     private String address;

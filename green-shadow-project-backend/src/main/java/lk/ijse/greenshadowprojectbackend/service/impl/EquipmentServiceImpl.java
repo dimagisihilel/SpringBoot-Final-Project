@@ -27,56 +27,67 @@ public class EquipmentServiceImpl implements EquipmentService {
     private EquipmentDao equipmentDao;
     @Autowired
     private Mapping equipmentMapper;
+
     @Override
+    // @PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR')")
     public EquipmentDto save(EquipmentDto dto) {
         dto.setEquipmentId(AppUtil.generateEquipmentId());
         EquipmentEntity equipment = equipmentMapper.toEquipmentEntity(dto);
         equipment = equipmentDao.save(equipment);
         return equipmentMapper.toEquipmentDto(equipment);
+
     }
+
     @Override
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR')")
     public EquipmentDto update(String id, EquipmentDto dto) {
         EquipmentEntity equipment = equipmentDao.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Equipment not found with ID: " + id));
+
         equipment.setType(dto.getType());
         equipment.setName(dto.getName());
         equipment.setStatus(dto.getStatus());
+
         if (dto.getFieldId() != null) {
             FieldEntity field = fieldDao.findById(dto.getFieldId())
                     .orElseThrow(() -> new IllegalArgumentException("Field not found with ID: " + dto.getFieldId()));
             equipment.setField(field);
         }
+
         if (dto.getStaffId() != null) {
             StaffEntity staff = staffDao.findById(dto.getStaffId())
                     .orElseThrow(() -> new IllegalArgumentException("Staff not found with ID: " + dto.getStaffId()));
             equipment.setStaff(staff);
         }
+
         return equipmentMapper.toEquipmentDto(equipmentDao.save(equipment));
     }
+
     @Override
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR')")
     public void delete(String id) {
         equipmentDao.deleteById(id);
     }
+
     @Override
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR') or hasRole('SCIENTIST')")
     public EquipmentDto findById(String id) {
         EquipmentEntity equipment = equipmentDao.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Equipment not found with ID: " + id));
         return equipmentMapper.toEquipmentDto(equipment);
     }
+
     @Override
+    //@PreAuthorize("hasRole('MANAGER') or hasRole('ADMINISTRATOR') or hasRole('SCIENTIST')")
     public List<EquipmentDto> findAll() {
         return equipmentMapper.asEquipmentDtoList(equipmentDao.findAll());
     }
-
-    @Override
     public List<EquipmentDto> getEquipmentByStaffId(String staffId) {
         StaffEntity staff = staffDao.findById(staffId)
                 .orElseThrow(() -> new IllegalArgumentException("Staff not found with ID: " + staffId));
         List<EquipmentEntity> equipmentList = equipmentDao.findByStaff(staff);
         return equipmentMapper.asEquipmentDtoList(equipmentList);
     }
-
-    @Override
     public List<EquipmentDto> getEquipmentByFieldId(String fieldId) {
         FieldEntity field = fieldDao.findById(fieldId)
                 .orElseThrow(() -> new IllegalArgumentException("Field not found with ID: " + fieldId));
